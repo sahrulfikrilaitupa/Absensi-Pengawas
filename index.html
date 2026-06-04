@@ -12,8 +12,20 @@
 <body class="bg-slate-50 min-h-screen p-4 md:p-8">
 
     <div class="max-w-md mx-auto bg-white rounded-3xl shadow-xl p-6">
-        <h1 class="text-2xl font-bold text-slate-800 mb-2">Absensi Pengawas</h1>
-        <p class="text-slate-500 mb-6 text-sm">Silakan isi data kehadiran Anda hari ini.</p>
+        
+        <!-- Header dengan Tombol Lihat Data -->
+        <div class="flex justify-between items-start mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800 mb-1">Absensi Pengawas</h1>
+                <p class="text-slate-500 text-sm">Silakan isi data kehadiran Anda.</p>
+            </div>
+            <!-- Tombol Lihat Data -->
+            <a href="URL_GOOGLE_SHEET_ANDA_DISINI" target="_blank" class="p-2 bg-indigo-50 text-indigo-600 rounded-full hover:bg-indigo-100 transition-colors shadow-sm" title="Lihat Data Absen">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+            </a>
+        </div>
 
         <form id="absensiForm" class="space-y-4">
             <!-- Nama -->
@@ -27,7 +39,6 @@
                 <label class="block text-sm font-medium text-slate-700 mb-1">Pilih Ruang Kelas</label>
                 <select id="kelas" required class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
                     <option value="">Pilih Ruang...</option>
-                    <!-- Group VII -->
                     <optgroup label="Kelas VII">
                         <option value="VII-1">VII-1</option> <option value="VII-2">VII-2</option>
                         <option value="VII-3">VII-3</option> <option value="VII-4">VII-4</option>
@@ -35,7 +46,6 @@
                         <option value="VII-7">VII-7</option> <option value="VII-8">VII-8</option>
                         <option value="VII-9">VII-9</option>
                     </optgroup>
-                    <!-- Group VIII -->
                     <optgroup label="Kelas VIII">
                         <option value="VIII-1">VIII-1</option> <option value="VIII-2">VIII-2</option>
                         <option value="VIII-3">VIII-3</option> <option value="VIII-4">VIII-4</option>
@@ -71,8 +81,10 @@
             ctx.lineWidth = 2;
             ctx.lineCap = 'round';
             const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX || e.touches[0].clientX) - rect.left;
-            const y = (e.clientY || e.touches[0].clientY) - rect.top;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
             ctx.lineTo(x, y);
             ctx.stroke();
             ctx.moveTo(x, y);
@@ -91,6 +103,7 @@
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
             btn.innerText = "Mengirim...";
+            btn.disabled = true;
             
             const data = {
                 nama: document.getElementById('nama').value,
@@ -98,8 +111,7 @@
                 ttd: canvas.toDataURL()
             };
 
-            // Ganti URL ini dengan URL Web App Google Script Anda
-            const SCRIPT_URL = "ISI_URL_GOOGLE_APPS_SCRIPT_ANDA_DISINI";
+            const SCRIPT_URL = "https://docs.google.com/spreadsheets/d/1v3CuND99k-fkc1zUCekVj3siYGSCNn7KusiXKAEFSvs/edit?gid=0#gid=0";
 
             try {
                 await fetch(SCRIPT_URL, {
@@ -109,11 +121,14 @@
                 });
                 alert('Berhasil Absen!');
                 location.reload();
-            } catch (err) { alert('Gagal mengirim data.'); }
+            } catch (err) { 
+                alert('Gagal mengirim data. Pastikan koneksi stabil.');
+                btn.innerText = "Simpan Absensi";
+                btn.disabled = false;
+            }
         });
 
-       
-        // URL API dari Sheety atau SheetDB Anda
+         // URL API dari Sheety atau SheetDB Anda
         const url = 'https://sheetdb.io/api/v1/8a3sy3xfii61x'; 
 
         fetch(url)
