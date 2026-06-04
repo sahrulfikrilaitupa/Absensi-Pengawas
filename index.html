@@ -136,10 +136,10 @@
             .then(data => {
                 const list = document.getElementById('data-list');
                 // Ganti 'namaSheet' sesuai dengan nama tabel/sheet Anda
-                data.AbsensiDigital.forEach(item => {
+                data.AbsensiDatabase.forEach(item => {
                     let li = document.createElement('li');
                     // Ganti 'kolomData' sesuai dengan judul kolom di Google Sheet Anda
-                    li.textContent = item.kolomData; 
+                    li.textContent = item.('Timestamp,Nama,Kelas,Tanda Tangan'; 
                     list.appendChild(li);
                 });
             })
