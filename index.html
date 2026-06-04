@@ -1,1 +1,159 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absensi Pengawas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        #signature-pad { border: 2px dashed #e2e8f0; touch-action: none; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen p-4 md:p-8">
+
+    <div class="max-w-md mx-auto bg-white rounded-3xl shadow-xl p-6">
+        
+        <!-- Header dengan Tombol Lihat Data -->
+        <div class="flex justify-between items-start mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800 mb-1">Absensi Pengawas</h1>
+                <p class="text-slate-500 text-sm">Silakan isi data kehadiran Anda.</p>
+            </div>
+            <!-- Tombol Lihat Data -->
+            <a href="https://docs.google.com/spreadsheets/d/1v3CuND99k-fkc1zUCekVj3siYGSCNn7KusiXKAEFSvs/edit?usp=sharing" target="_blank" class="p-2 bg-indigo-50 text-indigo-600 rounded-full hover:bg-indigo-100 transition-colors shadow-sm" title="Lihat Data Absen">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+            </a>
+        </div>
+
+        <form id="absensiForm" class="space-y-4">
+            <!-- Nama -->
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap</label>
+                <input type="text" id="nama" required class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+
+            <!-- Kelas -->
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Pilih Ruang Kelas</label>
+                <select id="kelas" required class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <option value="">Pilih Ruang...</option>
+                    <optgroup label="Kelas VII">
+                        <option value="VII-1">VII-1</option> <option value="VII-2">VII-2</option>
+                        <option value="VII-3">VII-3</option> <option value="VII-4">VII-4</option>
+                        <option value="VII-5">VII-5</option> <option value="VII-6">VII-6</option>
+                        <option value="VII-7">VII-7</option> <option value="VII-8">VII-8</option>
+                        <option value="VII-9">VII-9</option>
+                    </optgroup>
+                    <optgroup label="Kelas VIII">
+                        <option value="VIII-1">VIII-1</option> <option value="VIII-2">VIII-2</option>
+                        <option value="VIII-3">VIII-3</option> <option value="VIII-4">VIII-4</option>
+                        <option value="VIII-5">VIII-5</option> <option value="VIII-6">VIII-6</option>
+                        <option value="VIII-7">VIII-7</option> <option value="VIII-8">VIII-8</option>
+                        <option value="VIII-9">VIII-9</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <!-- Tanda Tangan -->
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Tanda Tangan</label>
+                <canvas id="signature-pad" class="w-full h-40 bg-slate-50 rounded-xl"></canvas>
+                <button type="button" onclick="clearSignature()" class="text-xs text-red-500 mt-2 hover:underline">Hapus tanda tangan</button>
+            </div>
+
+            <button type="submit" id="submitBtn" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 transition">
+                Simpan Absensi
+            </button>
+        </form>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('signature-pad');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+
+        function startDrawing(e) { drawing = true; draw(e); }
+        function stopDrawing() { drawing = false; ctx.beginPath(); }
+        function draw(e) {
+            if (!drawing) return;
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.moveTo(x, y);
+        }
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('touchstart', startDrawing);
+        canvas.addEventListener('touchend', stopDrawing);
+        canvas.addEventListener('touchmove', draw);
+
+        function clearSignature() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+        document.getElementById('absensiForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.innerText = "Mengirim...";
+            btn.disabled = true;
+            
+            const data = {
+                nama: document.getElementById('nama').value,
+                kelas: document.getElementById('kelas').value,
+                ttd: canvas.toDataURL()
+            };
+
+            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwPI_YvfPsQDYU4EvDccSyGZGRQlkJNknr6d3mFY97H9Sf8IItqaJe9Cu4sN86RyPpz/exec";
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify(data)
+                });
+                alert('Berhasil Absen!');
+                location.reload();
+            } catch (err) { 
+                alert('Gagal mengirim data. Pastikan koneksi stabil.');
+                btn.innerText = "Simpan Absensi";
+                btn.disabled = false;
+            }
+        });
+
+         // URL API dari Sheety atau SheetDB Anda
+        const url = 'https://sheetdb.io/api/v1/8a3sy3xfii61x'; 
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const list = document.getElementById('data-list');
+                // Ganti 'namaSheet' sesuai dengan nama tabel/sheet Anda
+                data.AbsensiDigital.forEach(item => {
+                    let li = document.createElement('li');
+                    // Ganti 'kolomData' sesuai dengan judul kolom di Google Sheet Anda
+                    li.textContent = item.kolomData; 
+                    list.appendChild(li);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+
+            function TampilGambar(base64Data) {
+            var data = base64Data.split(',')[1];
+            var contentType = 'image/png';
+            var blob = Utilities.newBlob(Utilities.base64Decode(data), contentType, "image.png");
+            var file = DriveApp.createFile(blob);
+            return file.getUrl(); // Ini akan memberikan link yang bisa digunakan rumus =IMAGE()
+            }
+    
+    </script>
+</body>
+</html>
 
