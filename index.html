@@ -136,21 +136,23 @@
             .then(data => {
                 const list = document.getElementById('data-list');
                 // Ganti 'namaSheet' sesuai dengan nama tabel/sheet Anda
-                data.AbsensiDatabase.forEach(item => {
+                data.AbsensiDigital.forEach(item => {
                     let li = document.createElement('li');
                     // Ganti 'kolomData' sesuai dengan judul kolom di Google Sheet Anda
-                    li.textContent = item.('Timestamp,Nama,Kelas,Tanda Tangan'; 
+                    li.textContent = item.kolomData; 
                     list.appendChild(li);
                 });
             })
             .catch(error => console.error('Error:', error));
-                function TampilGambar(base64Data) {
-                var data = base64Data.split(',')[1];
-                var contentType = 'image/png';
-                var blob = Utilities.newBlob(Utilities.base64Decode(data), contentType, "image.png");
-                var file = DriveApp.createFile(blob);
-                return file.getUrl(); // Ini akan memberikan link yang bisa digunakan rumus =IMAGE()
-                }
+
+            function TampilGambar(base64Data) {
+            var data = base64Data.split(',')[1];
+            var contentType = 'image/png';
+            var blob = Utilities.newBlob(Utilities.base64Decode(data), contentType, "image.png");
+            var file = DriveApp.createFile(blob);
+            return file.getUrl(); // Ini akan memberikan link yang bisa digunakan rumus =IMAGE()
+            }
+    
     </script>
 </body>
 </html>
