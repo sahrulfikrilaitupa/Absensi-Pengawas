@@ -144,7 +144,13 @@
                 });
             })
             .catch(error => console.error('Error:', error));
-    
+                function TampilGambar(base64Data) {
+                var data = base64Data.split(',')[1];
+                var contentType = 'image/png';
+                var blob = Utilities.newBlob(Utilities.base64Decode(data), contentType, "image.png");
+                var file = DriveApp.createFile(blob);
+                return file.getUrl(); // Ini akan memberikan link yang bisa digunakan rumus =IMAGE()
+                }
     </script>
 </body>
 </html>
